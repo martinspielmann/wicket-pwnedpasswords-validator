@@ -5,6 +5,7 @@ The validator uses the free API of https://haveibeenpwned.com/ by [@troyhunt](ht
 validate that the password has not been previously exposed in data breaches.
 
 [![Build Status](https://ci.martinspielmann.de/buildStatus/icon?job=pingunaut/wicket-pwnedpasswords-validator/master)](https://ci.martinspielmann.de/job/pingunaut/job/wicket-pwnedpasswords-validator/job/master/)
+[![SonarQube Coverage](https://img.shields.io/sonar/https/sonarcloud.io/wicket-pwned-passwords-validator/coverage.svg)](https://sonarcloud.io/component_measures?id=wicket-pwnedpasswords-validator&metric=coverage)
 
 ## Usage
 
