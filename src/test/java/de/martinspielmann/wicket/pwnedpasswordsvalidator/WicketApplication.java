@@ -1,7 +1,12 @@
 package de.martinspielmann.wicket.pwnedpasswordsvalidator;
 
+import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
+
+import java.util.Locale;
 
 /**
  * Application object for your web application.

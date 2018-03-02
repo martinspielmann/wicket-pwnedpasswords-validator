@@ -1,5 +1,6 @@
 package de.martinspielmann.wicket.pwnedpasswordsvalidator;
 
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.validation.Validatable;
@@ -154,6 +155,7 @@ public class PwnedPasswordsValidatorTest {
         FormTester ft = tester.newFormTester("form");
         ft.setValue("pw", "secret123");
         ft.submit();
-        tester.assertErrorMessages("This password has been cracked and is not secure anymore. Please choose another one.");
+        String feedback = ft.getForm().getLocalizer().getString("PwnedPasswordsValidator.pwned", ft.getForm().get("pw"));
+        tester.assertErrorMessages(feedback);
     }
 }
