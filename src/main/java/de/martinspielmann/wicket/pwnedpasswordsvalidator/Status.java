@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents the status of haveibeenpwned API response.
+ * Represents the status of have i been pwned? API response.
  *
  * @author Martin Spielmann
  */
