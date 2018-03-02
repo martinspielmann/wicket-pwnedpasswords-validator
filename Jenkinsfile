@@ -21,5 +21,16 @@ pipeline {
                 sh 'mvn install'
             }
         }
+
+        stage('QA') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    script {
+                        def scannerHome = tool 'sonarqube-scanner'
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
     }
 }
