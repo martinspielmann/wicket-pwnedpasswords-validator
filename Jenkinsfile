@@ -23,12 +23,14 @@ pipeline {
         }
 
         stage('QA') {
-            withSonarQubeEnv('sonar') {
-                script {
-                    def scannerHome = tool 'sonarqube-scanner'
-                    sh "${scannerHome}/bin/sonar-scanner"
+            steps {
+                withSonarQubeEnv('sonar') {
+                    script {
+                        def scannerHome = tool 'sonarqube-scanner'
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
-       }
+        }
     }
 }
