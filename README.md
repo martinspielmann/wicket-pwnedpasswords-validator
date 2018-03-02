@@ -4,12 +4,18 @@ A validator for Apache Wicket that checks if a given password has been pwned.
 The validator uses the free API of https://haveibeenpwned.com/ by [@troyhunt](https://github.com/troyhunt) to 
 validate that the password has not been previously exposed in data breaches.
 
+[![Build Status](https://ci.martinspielmann.de/buildStatus/icon?job=pingunaut/wicket-pwnedpasswords-validator/master)](https://ci.martinspielmann.de/job/pingunaut/job/wicket-pwnedpasswords-validator/job/master/)
+
 ## Usage
 
 1. Include maven dependency in your pom.xml
 
 ```xml
-ADD MVN DEPENDENCY SNIPPED HERE AS SOON AS IT IS AVAILABLE IN CENTRAL
+<dependency>
+  <groupId>de.martinspielmann.wicket</groupId>
+  <artifactId>wicket-pwnedpasswords-validator</artifactId>
+  <version>1.0.0</version>
+</dependency>
 ```
 
 2. Add PwnedPasswordsValidator to your PasswordTextField 
