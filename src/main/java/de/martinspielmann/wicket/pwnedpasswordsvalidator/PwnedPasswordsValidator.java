@@ -26,7 +26,9 @@ import java.security.NoSuchAlgorithmException;
  */
 public class PwnedPasswordsValidator implements IValidator<String> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PwnedPasswordsValidator.class);
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOG = LoggerFactory.getLogger(PwnedPasswordsValidator.class);
 
     private static final String API_URL = "https://api.pwnedpasswords.com/pwnedpassword/%s";
 
@@ -109,6 +111,7 @@ public class PwnedPasswordsValidator implements IValidator<String> {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     LOG.error("Error waiting to request pwned passwords", e);
+                    Thread.currentThread().interrupt();
                 }
                 validate(validatable);
                 break;

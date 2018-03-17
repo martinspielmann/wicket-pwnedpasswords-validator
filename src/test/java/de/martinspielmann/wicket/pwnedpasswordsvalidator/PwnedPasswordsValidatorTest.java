@@ -1,6 +1,5 @@
 package de.martinspielmann.wicket.pwnedpasswordsvalidator;
 
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.validation.Validatable;
@@ -10,6 +9,7 @@ import org.junit.Test;
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PwnedPasswordsValidatorTest {
 
@@ -96,7 +96,51 @@ public class PwnedPasswordsValidatorTest {
         v.validate(validatable);
         Assert.assertEquals(0, validatable.getErrors().size());
     }
-
+    
+    @Test
+    public void validatePwTooManyRequestsIgnore() {
+        PwnedPasswordsValidator v = new PwnedPasswordsValidator(true, RateLimitExceededBehavior.IGNORE) {
+            @Override
+            protected Status getResponseStatus(String pw) {
+                return Status.TOO_MANY_REQUESTS;
+            }
+        };
+        Validatable<String> validatable = new Validatable<>();
+        v.validate(validatable);
+        Assert.assertEquals(0, validatable.getErrors().size());
+    }
+    
+    @Test
+    public void validatePwTooManyRequestsFail() {
+        PwnedPasswordsValidator v = new PwnedPasswordsValidator(true, RateLimitExceededBehavior.FAIL) {
+            @Override
+            protected Status getResponseStatus(String pw) {
+                return Status.TOO_MANY_REQUESTS;
+            }
+        };
+        Validatable<String> validatable = new Validatable<>();
+        v.validate(validatable);
+        Assert.assertEquals(1, validatable.getErrors().size());
+    }
+    
+    @Test
+    public void validatePwTooManyRequestsRetry() {
+    	final AtomicInteger i = new AtomicInteger(0);
+    	PwnedPasswordsValidator v = new PwnedPasswordsValidator(true, RateLimitExceededBehavior.RETRY) {
+            @Override
+            protected Status getResponseStatus(String pw) {
+            	if(i.getAndIncrement() == 0) {
+            		return Status.TOO_MANY_REQUESTS;
+            	}else {
+            		return Status.PASSWORD_OK;
+            	}
+            }
+        };
+        Validatable<String> validatable = new Validatable<>();
+        v.validate(validatable);
+        Assert.assertEquals(0, validatable.getErrors().size());
+        Assert.assertEquals(2, i.get());
+    }
 
     @Test
     public void getResponseStatusPwned() throws InterruptedException {
