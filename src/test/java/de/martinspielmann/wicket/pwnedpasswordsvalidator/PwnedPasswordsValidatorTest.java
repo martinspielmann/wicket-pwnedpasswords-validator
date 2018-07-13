@@ -181,7 +181,7 @@ public class PwnedPasswordsValidatorTest {
     @Test
     public void getApiUrl() throws MalformedURLException, NoSuchAlgorithmException {
         PwnedPasswordsValidator v = new PwnedPasswordsValidator();
-        URL u = new URL("https://api.pwnedpasswords.com/pwnedpassword/F2B14F68EB995FACB3A1C35287B778D5BD785511");
+        URL u = new URL("https://api.pwnedpasswords.com/range/F2B14");
         Assert.assertEquals(u, v.getApiUrl("secret123"));
     }
 
