@@ -14,7 +14,7 @@ validate that the password has not been previously exposed in data breaches.
 <dependency>
   <groupId>de.martinspielmann.wicket</groupId>
   <artifactId>wicket-pwnedpasswords-validator</artifactId>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
