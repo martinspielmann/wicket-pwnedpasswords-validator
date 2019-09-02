@@ -34,9 +34,15 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 
 	private static final String API_URL = "https://api.pwnedpasswords.com/range/%s";
 
+	private static String apiKey;
+
 	private final boolean failOnUnknownError;
 	private final RateLimitExceededBehavior rateLimitExceededBehavior;
 	private final Proxy proxy;
+
+	public static void configureApiKey(String apikey) {
+		PwnedPasswordsValidator.apiKey = apikey;
+	}
 
 	/**
 	 * Creates a new PwnedPasswordsValidator with default configuration. If an error
@@ -55,20 +61,25 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 	/**
 	 * Creates a new PwnedPasswordsValidator
 	 *
-	 * @param failOnUnknownError
-	 *            If {@code true}, if an error occurs during validation, the
-	 *            validated password will be treated as invalid. Else errors will be
-	 *            ignored and the password will be treated as valid.
-	 * @param rateLimitExceededBehavior
-	 *            If set to {@link RateLimitExceededBehavior#IGNORE}, if rate limit
-	 *            is exceeded during validation, the validated password will be
-	 *            treated as valid. If set to
-	 *            {@link RateLimitExceededBehavior#RETRY}, if rate limit is exceeded
-	 *            during validation, the {@code Thread} will sleep for two seconds
-	 *            and validation will be retried afterwards. If set to
-	 *            {@link RateLimitExceededBehavior#FAIL}, if rate limit is exceeded
-	 *            during validation, the validated password will be treated as
-	 *            invalid.
+	 * @param failOnUnknownError        If {@code true}, if an error occurs during
+	 *                                  validation, the validated password will be
+	 *                                  treated as invalid. Else errors will be
+	 *                                  ignored and the password will be treated as
+	 *                                  valid.
+	 * @param rateLimitExceededBehavior If set to
+	 *                                  {@link RateLimitExceededBehavior#IGNORE}, if
+	 *                                  rate limit is exceeded during validation,
+	 *                                  the validated password will be treated as
+	 *                                  valid. If set to
+	 *                                  {@link RateLimitExceededBehavior#RETRY}, if
+	 *                                  rate limit is exceeded during validation,
+	 *                                  the {@code Thread} will sleep for two
+	 *                                  seconds and validation will be retried
+	 *                                  afterwards. If set to
+	 *                                  {@link RateLimitExceededBehavior#FAIL}, if
+	 *                                  rate limit is exceeded during validation,
+	 *                                  the validated password will be treated as
+	 *                                  invalid.
 	 */
 	public PwnedPasswordsValidator(boolean failOnUnknownError, RateLimitExceededBehavior rateLimitExceededBehavior) {
 		this(failOnUnknownError, rateLimitExceededBehavior, null);
@@ -77,28 +88,35 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 	/**
 	 * Creates a new PwnedPasswordsValidator
 	 *
-	 * @param failOnUnknownError
-	 *            If {@code true}, if an error occurs during validation, the
-	 *            validated password will be treated as invalid. Else errors will be
-	 *            ignored and the password will be treated as valid.
-	 * @param rateLimitExceededBehavior
-	 *            If set to {@link RateLimitExceededBehavior#IGNORE}, if rate limit
-	 *            is exceeded during validation, the validated password will be
-	 *            treated as valid. If set to
-	 *            {@link RateLimitExceededBehavior#RETRY}, if rate limit is exceeded
-	 *            during validation, the {@code Thread} will sleep for two seconds
-	 *            and validation will be retried afterwards. If set to
-	 *            {@link RateLimitExceededBehavior#FAIL}, if rate limit is exceeded
-	 *            during validation, the validated password will be treated as
-	 *            invalid.
-	 * @param proxy
-	 *            the proxy server
+	 * @param failOnUnknownError        If {@code true}, if an error occurs during
+	 *                                  validation, the validated password will be
+	 *                                  treated as invalid. Else errors will be
+	 *                                  ignored and the password will be treated as
+	 *                                  valid.
+	 * @param rateLimitExceededBehavior If set to
+	 *                                  {@link RateLimitExceededBehavior#IGNORE}, if
+	 *                                  rate limit is exceeded during validation,
+	 *                                  the validated password will be treated as
+	 *                                  valid. If set to
+	 *                                  {@link RateLimitExceededBehavior#RETRY}, if
+	 *                                  rate limit is exceeded during validation,
+	 *                                  the {@code Thread} will sleep for two
+	 *                                  seconds and validation will be retried
+	 *                                  afterwards. If set to
+	 *                                  {@link RateLimitExceededBehavior#FAIL}, if
+	 *                                  rate limit is exceeded during validation,
+	 *                                  the validated password will be treated as
+	 *                                  invalid.
+	 * @param proxy                     the proxy server
 	 */
 	public PwnedPasswordsValidator(boolean failOnUnknownError, RateLimitExceededBehavior rateLimitExceededBehavior,
 			Proxy proxy) {
 		this.failOnUnknownError = failOnUnknownError;
 		this.rateLimitExceededBehavior = rateLimitExceededBehavior;
 		this.proxy = proxy;
+		if (apiKey == null) {
+			throw new NullPointerException("Before the first usage of PwnedPasswordsValidator, make sure you set the hibp-api-key using PwnedPasswordsValidator.configureApiKey()");
+		}
 	}
 
 	@Override
@@ -118,8 +136,12 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 		case TOO_MANY_REQUESTS:
 			handleToManyRequests(validatable);
 			break;
+		case PASSWORD_UNAUTHORIZED:
+			break;
 		case PASSWORD_OK:
 			// great. password not pwned.
+			break;
+		default:
 			break;
 		}
 	}
@@ -144,38 +166,39 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 	}
 
 	protected Status getResponseStatus(String pw) {
-        try {
-        	
-            HttpURLConnection c;
-            if (getProxy() != null) {
-                c = (HttpURLConnection) getApiUrl(pw).openConnection(getProxy());
-            } else {
-                c = (HttpURLConnection) getApiUrl(pw).openConnection();
-            }
-            c.setRequestMethod("GET");
-            c.setRequestProperty("User-Agent", "pingunaut/wicket-pwnedpasswords-validator");
-            c.connect();
-            
-            Status status = Status.of(c.getResponseCode());
-            // if nothing is found or there was an API error, return
-            if(!status.equals(Status.PASSWORD_PWNED)) {
-            	return status;
-            }
-            // if there were results, check if your pw hash was pwned
-            String result = IOUtils.toString(c.getInputStream(), StandardCharsets.UTF_8);
-            String lines[] = result.split("\\r?\\n");
-            String hashSuffix = getHashSuffix(pw);
-            for(String line : lines) {
-            	if(line.split(":")[0].equals(hashSuffix)) {
-            		return Status.PASSWORD_PWNED;
-            	}
-            }
-            return Status.PASSWORD_OK;
-        } catch (IOException | NoSuchAlgorithmException e) {
-            LOG.error("Error checking password for pwnage", e);
-            return Status.UNKNOWN_API_ERROR;
-        }
-    }
+		try {
+
+			HttpURLConnection c;
+			if (getProxy() != null) {
+				c = (HttpURLConnection) getApiUrl(pw).openConnection(getProxy());
+			} else {
+				c = (HttpURLConnection) getApiUrl(pw).openConnection();
+			}
+			c.setRequestMethod("GET");
+			c.setRequestProperty("User-Agent", "pingunaut/wicket-pwnedpasswords-validator");
+			c.setRequestProperty("hibp-api-key", apiKey);
+			c.connect();
+
+			Status status = Status.of(c.getResponseCode());
+			// if nothing is found or there was an API error, return
+			if (!status.equals(Status.PASSWORD_PWNED)) {
+				return status;
+			}
+			// if there were results, check if your pw hash was pwned
+			String result = IOUtils.toString(c.getInputStream(), StandardCharsets.UTF_8);
+			String lines[] = result.split("\\r?\\n");
+			String hashSuffix = getHashSuffix(pw);
+			for (String line : lines) {
+				if (line.split(":")[0].equals(hashSuffix)) {
+					return Status.PASSWORD_PWNED;
+				}
+			}
+			return Status.PASSWORD_OK;
+		} catch (IOException | NoSuchAlgorithmException e) {
+			LOG.error("Error checking password for pwnage", e);
+			return Status.UNKNOWN_API_ERROR;
+		}
+	}
 
 	protected Proxy getProxy() {
 		return proxy;
@@ -192,11 +215,11 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 	protected String getHashPrefix(String pw) throws NoSuchAlgorithmException {
 		return sha1(pw).substring(0, 5);
 	}
-	
+
 	protected String getHashSuffix(String pw) throws NoSuchAlgorithmException {
 		return sha1(pw).substring(5);
 	}
-	
+
 	protected URL getApiUrl(String pw) throws MalformedURLException, NoSuchAlgorithmException {
 		return new URL(String.format(API_URL, getHashPrefix(pw)));
 	}
@@ -205,11 +228,9 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 	 * The API allows to check passwords directly. To avoid url encoding issues with
 	 * complicated passwords, we use the possibility to check sha1 hashes
 	 *
-	 * @param pw
-	 *            the password
+	 * @param pw the password
 	 * @return sha1 hash of the given password
-	 * @throws NoSuchAlgorithmException
-	 *             if SHA-1 digest not available
+	 * @throws NoSuchAlgorithmException if SHA-1 digest not available
 	 */
 	protected String sha1(String pw) throws NoSuchAlgorithmException {
 		MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -220,10 +241,8 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 	/**
 	 * Allows subclasses to decorate reported errors
 	 *
-	 * @param error
-	 *            the error
-	 * @param validatable
-	 *            the validatable
+	 * @param error       the error
+	 * @param validatable the validatable
 	 * @return decorated error
 	 */
 	protected IValidationError decorate(IValidationError error, IValidatable<String> validatable) {
