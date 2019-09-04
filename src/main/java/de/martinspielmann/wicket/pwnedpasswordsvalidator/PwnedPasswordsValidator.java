@@ -204,6 +204,9 @@ public class PwnedPasswordsValidator implements IValidator<String> {
     }
 
     public Proxy get() {
+      if (type == Type.DIRECT) {
+        return Proxy.NO_PROXY;
+      }
       return new Proxy(type, sa);
     }
 
