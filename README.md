@@ -14,7 +14,7 @@ validate that the password has not been previously exposed in data breaches.
 <dependency>
   <groupId>de.martinspielmann.wicket</groupId>
   <artifactId>wicket-pwnedpasswords-validator</artifactId>
-  <version>2.0.0</version>
+  <version>3.0.0</version>
 </dependency>
 ```
 
@@ -29,7 +29,7 @@ PasswordTextField password = new PasswordTextField("password", new Model<>(""));
 form.add(password);
 
 // and here it is:
-password.add(new PwnedPasswordsValidator());
+password.add(new PwnedPasswordsValidator("YOUR-HIBP-API-KEY"));
 
 ```
 
@@ -48,8 +48,7 @@ mvn test
 
 ## Built With
 
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [Jenkins](https://jenkins.io/) - CI Server
+* [Maven](https://maven.apache.org/)
 
 ## Contributing
 
