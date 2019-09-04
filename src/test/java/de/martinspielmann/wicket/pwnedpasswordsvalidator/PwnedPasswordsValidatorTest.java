@@ -4,7 +4,6 @@ import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.validation.Validatable;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
@@ -94,32 +93,6 @@ public class PwnedPasswordsValidatorTest {
     Validatable<String> validatable = new Validatable<>();
     v.validate(validatable);
     Assert.assertEquals(0, validatable.getErrors().size());
-  }
-
-  @Test
-  public void validatePwTooManyRequestsIgnore() {
-    PwnedPasswordsValidator v = new PwnedPasswordsValidator(apiKey, true) {
-      @Override
-      protected Status getResponseStatus(String pw) {
-        return Status.TOO_MANY_REQUESTS;
-      }
-    };
-    Validatable<String> validatable = new Validatable<>();
-    v.validate(validatable);
-    Assert.assertEquals(0, validatable.getErrors().size());
-  }
-
-  @Test
-  public void validatePwTooManyRequestsFail() {
-    PwnedPasswordsValidator v = new PwnedPasswordsValidator(apiKey, true) {
-      @Override
-      protected Status getResponseStatus(String pw) {
-        return Status.TOO_MANY_REQUESTS;
-      }
-    };
-    Validatable<String> validatable = new Validatable<>();
-    v.validate(validatable);
-    Assert.assertEquals(1, validatable.getErrors().size());
   }
 
 
