@@ -9,15 +9,13 @@
 	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
 	OF ANY KIND, either express or implied. See the License for the specific 
 	language governing permissions and limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.martinspielmann.wicket</groupId>
 	<artifactId>wicket-pwnedpasswords-validator</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0</version>
 	<name>wicket-pwnedpasswords-validator</name>
 	<description>A validator for Apache Wicket that checks if a given password has been pwned.</description>
 	<url>https://github.com/pingunaut/wicket-pwnedpasswords-validator</url>
@@ -42,7 +40,7 @@
 		<connection>scm:git:git@github.com:pingunaut/wicket-pwnedpasswords-validator.git</connection>
 		<developerConnection>scm:git:git@github.com:pingunaut/wicket-pwnedpasswords-validator.git</developerConnection>
 		<url>https://github.com/pingunaut/wicket-pwnedpasswords-validator.git</url>
-		<tag>HEAD</tag>
+		<tag>wicket-pwnedpasswords-validator-3.0.0</tag>
 	</scm>
 
 	<developers>
