@@ -9,10 +9,13 @@ import org.apache.wicket.validation.ValidationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Proxy;
+import java.net.SocketAddress;
 import java.net.URL;
+import java.net.Proxy.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,7 +23,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Checks if a given password has been disclosed in a data breach using API of
  * <a href="https://haveibeenpwned.com/">https://haveibeenpwned.com/</a> More details at <a href=
- * "https://haveibeenpwned.com/API/v2#PwnedPasswords">https://haveibeenpwned.com/API/v2#PwnedPasswords</a>
+ * "https://haveibeenpwned.com/API/v3#PwnedPasswords">https://haveibeenpwned.com/API/v2#PwnedPasswords</a>
  *
  * @author Martin Spielmann
  */
@@ -34,7 +37,7 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 
   private final String apiKey;
   private final boolean failOnError;
-  private final Proxy proxy;
+  private final SerializableProxy proxy;
 
   /**
    * Creates a new PwnedPasswordsValidator with default configuration. If an error occurs during
@@ -50,9 +53,9 @@ public class PwnedPasswordsValidator implements IValidator<String> {
    * Creates a new PwnedPasswordsValidator
    *
    * @param apiKey the hibp-api-key
-   * @param failOnError If {@code true}, if an error occurs during validation, the validated
-   *        password will be treated as invalid. Else errors will be ignored and the password will
-   *        be treated as valid.
+   * @param failOnError If {@code true}, if an error occurs during validation, the validated password
+   *        will be treated as invalid. Else errors will be ignored and the password will be treated
+   *        as valid.
    */
   public PwnedPasswordsValidator(String apiKey, boolean failOnError) {
     this(apiKey, failOnError, null);
@@ -62,18 +65,22 @@ public class PwnedPasswordsValidator implements IValidator<String> {
    * Creates a new PwnedPasswordsValidator.
    *
    * @param apiKey the hibp-api-key
-   * @param failOnError If {@code true}, if an error occurs during validation, the validated
-   *        password will be treated as invalid. Else errors will be ignored and the password will
-   *        be treated as valid.
+   * @param failOnError If {@code true}, if an error occurs during validation, the validated password
+   *        will be treated as invalid. Else errors will be ignored and the password will be treated
+   *        as valid.
    * @param proxy the proxy server
    */
   public PwnedPasswordsValidator(String apiKey, boolean failOnError, Proxy proxy) {
-    this.apiKey = apiKey;
-    this.failOnError = failOnError;
-    this.proxy = proxy;
     if (apiKey == null) {
       throw new NullPointerException(
           "Before the first usage of PwnedPasswordsValidator, make sure you set the hibp-api-key using PwnedPasswordsValidator.configureApiKey()");
+    }
+    this.apiKey = apiKey;
+    this.failOnError = failOnError;
+    if (proxy != null) {
+      this.proxy = new SerializableProxy(proxy);
+    } else {
+      this.proxy = null;
     }
   }
 
@@ -86,9 +93,8 @@ public class PwnedPasswordsValidator implements IValidator<String> {
       case TOO_MANY_REQUESTS:
       case UNAUTHORIZED:
         if (shouldFailOnError()) {
-          validatable.error(
-              decorate(new ValidationError(this, "error").setVariable("code", status.getCode()),
-                  validatable));
+          validatable
+              .error(decorate(new ValidationError(this, "error").setVariable("code", status.getCode()), validatable));
         }
         break;
       case PASSWORD_PWNED:
@@ -123,7 +129,7 @@ public class PwnedPasswordsValidator implements IValidator<String> {
       }
       // if there were results, check if your pw hash was pwned
       String result = IOUtils.toString(c.getInputStream(), StandardCharsets.UTF_8);
-      String lines[] = result.split("\\r?\\n");
+      String[] lines = result.split("\\r?\\n");
       String hashSuffix = getHashSuffix(pw);
       for (String line : lines) {
         if (line.split(":")[0].equals(hashSuffix)) {
@@ -138,7 +144,10 @@ public class PwnedPasswordsValidator implements IValidator<String> {
   }
 
   protected Proxy getProxy() {
-    return proxy;
+    if (proxy == null) {
+      return null;
+    }
+    return proxy.get();
   }
 
   String getHashPrefix(String pw) throws NoSuchAlgorithmException {
@@ -180,6 +189,24 @@ public class PwnedPasswordsValidator implements IValidator<String> {
 
   boolean shouldFailOnError() {
     return failOnError;
+  }
+
+
+  private static class SerializableProxy implements Serializable {
+    private static final long serialVersionUID = 6611963348855847317L;
+
+    private Type type;
+    private SocketAddress sa;
+
+    public SerializableProxy(Proxy proxy) {
+      this.type = proxy.type();
+      this.sa = proxy.address();
+    }
+
+    public Proxy get() {
+      return new Proxy(type, sa);
+    }
+
   }
 
 }
