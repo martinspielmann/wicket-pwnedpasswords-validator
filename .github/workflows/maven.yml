@@ -14,9 +14,7 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: mvn package --file pom.xml
-    - name: SonarCloud Scan
-      run: mvn sonar:sonar --file pom.xml
+      run: mvn package sonar:sonar --file pom.xml
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
