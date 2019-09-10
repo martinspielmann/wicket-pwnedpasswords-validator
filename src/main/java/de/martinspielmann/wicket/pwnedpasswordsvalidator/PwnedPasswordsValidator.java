@@ -40,6 +40,14 @@ public class PwnedPasswordsValidator implements IValidator<String> {
   private final SerializableProxy proxy;
 
   /**
+   * Creates a new PwnedPasswordsValidator with default configuration without an API key. If an error
+   * occurs during validation, the validated password will be treated as invalid.
+   */
+  public PwnedPasswordsValidator() {
+    this(null, true, null);
+  }
+
+  /**
    * Creates a new PwnedPasswordsValidator with default configuration. If an error occurs during
    * validation, the validated password will be treated as invalid.
    * 
@@ -71,10 +79,6 @@ public class PwnedPasswordsValidator implements IValidator<String> {
    * @param proxy the proxy server
    */
   public PwnedPasswordsValidator(String apiKey, boolean failOnError, Proxy proxy) {
-    if (apiKey == null) {
-      throw new NullPointerException(
-          "Before the first usage of PwnedPasswordsValidator, make sure you set the hibp-api-key using PwnedPasswordsValidator.configureApiKey()");
-    }
     this.apiKey = apiKey;
     this.failOnError = failOnError;
     if (proxy != null) {
@@ -119,7 +123,9 @@ public class PwnedPasswordsValidator implements IValidator<String> {
       }
       c.setRequestMethod("GET");
       c.setRequestProperty("User-Agent", "pingunaut/wicket-pwnedpasswords-validator");
-      c.setRequestProperty("hibp-api-key", apiKey);
+      if (apiKey != null) {
+        c.setRequestProperty("hibp-api-key", apiKey);
+      }
       c.connect();
 
       Status status = Status.of(c.getResponseCode());
