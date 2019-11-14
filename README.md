@@ -5,7 +5,7 @@ The validator uses the free API of https://haveibeenpwned.com/ by [@troyhunt](ht
 validate that the password has not been previously exposed in data breaches.
 
 [![Build Status](https://github.com/pingunaut/wicket-pwnedpasswords-validator/workflows/Java%20CI/badge.svg)](https://github.com/pingunaut/wicket-pwnedpasswords-validator/actions)
-[![Coverage](https://img.shields.io/sonar/https/sonarcloud.io/wicket-pwnedpasswords-validator/coverage.svg)](https://sonarcloud.io/component_measures?id=wicket-pwnedpasswords-validator&metric=coverage)
+[![Coverage](https://img.shields.io/sonar/coverage/de.martinspielmann.wicket%3Awicket-pwnedpasswords-validator.svg?server=https%3A%2F%2Fsonarcloud.io)](https://sonarcloud.io/component_measures?id=de.martinspielmann.wicket%3Awicket-pwnedpasswords-validator&metric=coverage)
 ## Usage
 
 1. Include maven dependency in your pom.xml
