@@ -31,7 +31,7 @@
     <haveibeenpwned4j.version>1.0.0</haveibeenpwned4j.version>
     <jetty9.version>9.2.24.v20180105</jetty9.version>
     <log4j.version>2.6.2</log4j.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13</junit.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <wtp.version>none</wtp.version>
     <java.version>1.8</java.version>
@@ -41,6 +41,9 @@
     <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
     <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
     <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
+    <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+    <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
+    <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
   </properties>
 
   <scm>
@@ -216,7 +219,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>${maven-javadoc-plugin.version}</version>
           <configuration>
             <source>${java.version}</source>
           </configuration>
@@ -233,7 +236,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.8</version>
+            <version>${nexus-staging-maven-plugin.version}</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
@@ -269,7 +272,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>${maven-gpg-plugin.version}</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
