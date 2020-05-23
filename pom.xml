@@ -15,7 +15,7 @@
   <groupId>de.martinspielmann.wicket</groupId>
   <artifactId>wicket-pwnedpasswords-validator</artifactId>
   <packaging>jar</packaging>
-  <version>4.0.1-SNAPSHOT</version>
+  <version>4.1.0</version>
   <name>wicket-pwnedpasswords-validator</name>
   <description>A validator for Apache Wicket that checks if a given password has been pwned.</description>
   <url>https://github.com/pingunaut/wicket-pwnedpasswords-validator</url>
@@ -50,7 +50,7 @@
     <connection>scm:git:git@github.com:pingunaut/wicket-pwnedpasswords-validator.git</connection>
     <developerConnection>scm:git:git@github.com:pingunaut/wicket-pwnedpasswords-validator.git</developerConnection>
     <url>https://github.com/pingunaut/wicket-pwnedpasswords-validator.git</url>
-    <tag>HEAD</tag>
+    <tag>wicket-pwnedpasswords-validator-4.1.0</tag>
   </scm>
 
   <developers>
